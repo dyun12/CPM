@@ -1,0 +1,68 @@
+
+import Foundation
+import SwiftData
+import UIKit //UIkit 임포트 추가
+@Model
+class Activity {
+public var id: Int
+public var name: String
+public var duration: Int
+public var parentPred: [Activity] = [] public var parentSucc: [Activity] = [] public var equipmentName: String = "" public var equipmentUsageHours: Int = 0
+//image
+public var imageData: Data?
+//완료상태
+public var isManuallyCompleted: Bool = false @Relationship(deleteRule: .nullify, inverse: \Activity.parentPred) public var predecessors: [Activity] = []
+
+@Relationship(deleteRule: .nullify, inverse: \Activity.parentSucc)
+public var successors: [Activity] = []
+
+public var earlyStart: Int = 0 public var earlyFinish: Int = 0 public var lateStart: Int = 0 public var lateFinish: Int = 0 public var totalFloat: Int = 0 public var freeFloat: Int = 0 public var actualStart: Int = 0 public var actualFinish: Int = 0
+
+//image 저장
+func setImage(_ image: UIImage) {
+self.imageData = image.jpegData(compressionQuality: 0.8)
+}
+//image 가져오기
+func getImage() -> UIImage? {
+guard let imageData = imageData else {return nil} return UIImage(data: imageData)
+}
+
+init(id: Int, name: String, duration: Int, predecessors: [Activity] = [], successors: [Activity] = []) {
+self.id = id
+self.name = name
+self.duration = duration self.predecessors = predecessors self.successors = successors
+}
+
+init(id: Int, name: String, duration: Int) {
+self.id = id
+self.name = name
+self.duration = duration
+ 
+
+}
+
+
+
+public func setEarlyTime(earlyStart: Int, earlyFinish: Int) {
+self.earlyStart = earlyStart
+self.earlyFinish = earlyFinish
+}
+
+public func setLateTime(lateStart: Int, lateFinish: Int) {
+self.lateStart = lateStart
+self.lateFinish = lateFinish
+}
+
+public func isFirst() -> Bool {
+if predecessors.isEmpty {
+return true
+} else {
+let predArray = predecessors.map { $0.actualFinish }
+return predArray.allSatisfy { $0 > 0 }
+}
+}
+public func setRelation(predecessors: [Activity] = [], successors: [Activity] = []) {
+self.predecessors = predecessors
+self.successors = successors
+}
+}
